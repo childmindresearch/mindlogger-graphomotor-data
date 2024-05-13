@@ -1,3 +1,7 @@
+# PHI Data
+data/
+
+# Ruff
 .ruff_cache
 
 # Byte-compiled / optimized / DLL files
