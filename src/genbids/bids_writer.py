@@ -35,6 +35,19 @@ class MergeStrategy(Enum):
     RENAME_ENTITIES = 5
     NEW_SESSION = 6
 
+    def __str__(self) -> str:
+        """Return string representation of MergeStrategy."""
+        return self.name
+
+    def __repr__(self) -> str:
+        """Return string representation of MergeStrategy."""
+        return f"{self.__class__}.{str(self)}"
+
+    @staticmethod
+    def argparse(s: str) -> MergeStrategy:
+        """Parse MergeStrategy from argparse string."""
+        return MergeStrategy[s.upper()]
+
 
 class BidsWriter:
     """Writer for BIDS Model."""
