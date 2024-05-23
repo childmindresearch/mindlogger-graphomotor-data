@@ -8,8 +8,7 @@ from typing import List, Optional, Tuple
 from zipfile import ZipFile
 
 import pandas as pd
-
-from genbids.bids_model import BidsBuilder, BidsModel
+from bidsi import BidsBuilder, BidsModel
 
 LOG = logging.getLogger(__name__)
 

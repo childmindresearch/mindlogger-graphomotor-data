@@ -10,6 +10,7 @@ packages = [{include = "oak-mindlogger", from = "src"}]
 [tool.poetry.dependencies]
 python = "~3.12"
 pandas = "^2.2.2"
+bidsi = {git = "ssh://git@github.com/childmindresearch/bidsi.git"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"

@@ -30,6 +30,24 @@ astroid = ["astroid (>=1,<2)", "astroid (>=2,<4)"]
 test = ["astroid (>=1,<2)", "astroid (>=2,<4)", "pytest"]
 
 [[package]]
+name = "bidsi"
+version = "0.1.0"
+description = "Library for writing BIDS file structures."
+optional = false
+python-versions = "~3.12"
+files = []
+develop = false
+
+[package.dependencies]
+pandas = "^2.2.2"
+
+[package.source]
+type = "git"
+url = "ssh://git@github.com/childmindresearch/bidsi.git"
+reference = "HEAD"
+resolved_reference = "6d3e36532c0fb2e762fdb266886e4cd1c7448019"
+
+[[package]]
 name = "cffi"
 version = "1.16.0"
 description = "Foreign Function Interface for Python calling C code."
@@ -1339,4 +1357,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.12"
-content-hash = "ac7c5acaeaa21386119dcc73389655ee9c5560ff5800549433950cc381c9b959"
+content-hash = "bdc51aa7a754908e0e12793c9d2ef54832631f15cd10f2840d0138cff090b78f"

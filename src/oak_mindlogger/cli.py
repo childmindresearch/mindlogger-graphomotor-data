@@ -3,7 +3,8 @@
 import argparse
 from pathlib import Path
 
-from ..genbids.bids_writer import BidsWriter, MergeStrategy
+from bidsi import BidsWriter, MergeStrategy
+
 from .oak_report import OakReport
 
 
