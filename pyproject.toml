@@ -5,7 +5,10 @@ description = "Mindlogger export parsing and conversion in Python"
 authors = ["Gabriel Schubiner <gabriel.schubiner@childmind.org>"]
 license = ""
 readme = "README.md"
-packages = [{include = "oak-mindlogger", from = "src"}]
+packages = [{include = "oak_mindlogger", from = "src"}]
+
+[tool.poetry.scripts]
+oak2bids = "oak_mindlogger:cli"
 
 [tool.poetry.dependencies]
 python = "~3.12"

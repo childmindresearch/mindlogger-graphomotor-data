@@ -17,7 +17,8 @@ def main(
     writer.write()
 
 
-if __name__ == "__main__":
+def cli() -> None:
+    """Command-line interface for Oak MindLogger package."""
     parser = argparse.ArgumentParser(
         prog="Oak BIDS",
         description="Converts Oak export data from MindLogger to BIDS format.",
@@ -47,3 +48,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     main(args.mindlogger_export_dir, args.bids_root_dir, args.merge_strategy)
+
+
+if __name__ == "__main__":
+    cli()
