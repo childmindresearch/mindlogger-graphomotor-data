@@ -1,6 +1,9 @@
 # PHI Data
 data/
 
+# MacOS
+.DS_Store
+
 # Ruff
 .ruff_cache
 
