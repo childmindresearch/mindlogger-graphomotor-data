@@ -5,14 +5,14 @@ from pathlib import Path
 
 from bidsi import BidsWriter, MergeStrategy
 
-from .oak_report import OakReport
+from .graphomotor import GraphomotorReport
 
 
 def main(
     mindlogger_export_dir: Path, bids_root: Path, merge_strategy: MergeStrategy
 ) -> None:
     """Main method for command-line interface."""
-    report = OakReport.create(mindlogger_export_dir)
+    report = GraphomotorReport.create(mindlogger_export_dir)
     writer = BidsWriter(bids_root, merge_strategy, report.bids_model())
     writer.write()
 

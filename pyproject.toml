@@ -1,14 +1,14 @@
 [tool.poetry]
-name = "oak-mindlogger"
+name = "mindlogger-graphomotor"
 version = "0.1.0"
 description = "Mindlogger export parsing and conversion in Python"
 authors = ["Gabriel Schubiner <gabriel.schubiner@childmind.org>"]
 license = ""
 readme = "README.md"
-packages = [{include = "oak_mindlogger", from = "src"}]
+packages = [{include = "mindlogger_graphomotor", from = "src"}]
 
 [tool.poetry.scripts]
-oak2bids = "oak_mindlogger:cli"
+oak2bids = "mindlogger_graphomotor.__main__:cli"
 
 [tool.poetry.dependencies]
 python = "~3.12"

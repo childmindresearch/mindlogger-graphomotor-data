@@ -1,4 +1,4 @@
-"""Model for Oak report of MindLogger data."""
+"""Model for Graphomotor MindLogger data."""
 
 from __future__ import annotations
 
@@ -13,8 +13,8 @@ from bidsi import BidsBuilder, BidsModel
 LOG = logging.getLogger(__name__)
 
 
-class OakReport:
-    """Model of Oak report data and import/export methods."""
+class GraphomotorReport:
+    """Model of Graphomotor report data and import/export methods."""
 
     __DATE_REGEX = r"(\w{3}\s\w{3}\s\d{1,2}\s\d{4})"
     _ACTIVITY_USER_JOURNEY_FILENAME = "activity_user_journey.csv"
@@ -40,7 +40,7 @@ class OakReport:
         trails_dir: Path,
         datetime_format: Optional[str] = None,
     ) -> None:
-        """Initialize Oak report."""
+        """Initialize Graphomotor report."""
         self._data_directory = data_directory
         self._activity_user_journey = activity_user_journey
         self._report = report
@@ -187,7 +187,7 @@ class OakReport:
         return builder.build()
 
     @classmethod
-    def create(cls, data_directory: Path) -> OakReport:
+    def create(cls, data_directory: Path) -> GraphomotorReport:
         """Collect files from data directory."""
         if not data_directory.is_dir():
             raise FileNotFoundError(f"Directory {data_directory} does not exist.")
