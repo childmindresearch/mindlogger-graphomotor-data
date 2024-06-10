@@ -1,19 +1,24 @@
 """Main command-line interface for the Oak MindLogger package."""
 
 import argparse
+import logging
 from pathlib import Path
 
-from bidsi import BidsWriter, MergeStrategy
+from bidsi import BidsConfig, BidsWriter
 
 from .graphomotor import GraphomotorReport
 
 
 def main(
-    mindlogger_export_dir: Path, bids_root: Path, merge_strategy: MergeStrategy
+    mindlogger_export_dir: Path,
+    bids_root: Path,
+    config: Path,
 ) -> None:
     """Main method for command-line interface."""
+    logging.basicConfig(level=logging.DEBUG)
     report = GraphomotorReport.create(mindlogger_export_dir)
-    writer = BidsWriter(bids_root, merge_strategy, report.bids_model())
+    writer = BidsWriter(bids_root, BidsConfig.from_file(config), report.bids_model())
+    print("=========== Writing BIDS ===========")
     writer.write()
 
 
@@ -38,16 +43,14 @@ def cli() -> None:
         help="Path to output BIDS directory.",
     )
     parser.add_argument(
-        "--merge_strategy",
-        "-s",
-        type=MergeStrategy.argparse,
-        default=MergeStrategy.OVERWRITE,
-        choices=list(MergeStrategy),
-        help="Merge strategy for BIDS entities.",
+        "--bids_config",
+        "-c",
+        type=Path,
+        help="Config file for Bidsi.",
     )
     args = parser.parse_args()
 
-    main(args.mindlogger_export_dir, args.bids_root_dir, args.merge_strategy)
+    main(args.mindlogger_export_dir, args.bids_root_dir, args.bids_config)
 
 
 if __name__ == "__main__":

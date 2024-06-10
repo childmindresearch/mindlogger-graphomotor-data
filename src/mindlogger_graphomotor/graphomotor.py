@@ -145,7 +145,6 @@ class GraphomotorReport:
             if row.item == "study_id":
                 continue
             (resource, suffix) = self._parse_response(row.response)
-            print(f"resource: {resource}, suffix: {suffix}")
             builder.add(
                 subject_id=row.study_id,
                 datatype="beh",

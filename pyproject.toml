@@ -8,7 +8,7 @@ readme = "README.md"
 packages = [{include = "mindlogger_graphomotor", from = "src"}]
 
 [tool.poetry.scripts]
-oak2bids = "mindlogger_graphomotor.__main__:cli"
+graphomotor2bids = "mindlogger_graphomotor.__main__:cli"
 
 [tool.poetry.dependencies]
 python = "~3.12"

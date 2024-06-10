@@ -1,0 +1,19 @@
+[structure]
+include_session_dir = false
+
+[merge]
+bids = "MERGE"
+participants = "MERGE"
+dataset_description = "OVERWRITE"
+entity_metadata = "OVERWRITE"
+entity = "OVERWRITE"
+subject_dir = "OVERWRITE"
+session_dir = "OVERWRITE"
+
+[entity]
+clean_fields = true
+
+[entity.default_template]
+name = "default"
+suffix = "graphomotor"
+template = ["subject_id", "task_name"]
