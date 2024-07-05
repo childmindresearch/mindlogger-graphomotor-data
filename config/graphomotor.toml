@@ -17,3 +17,12 @@ clean_fields = true
 name = "default"
 suffix = "graphomotor"
 template = ["subject_id", "task_name"]
+
+[[entity.templates]]
+name = "events"
+suffix = "events"
+template = ["subject_id", "task_name"]
+
+[[entity.templates.filters]]
+field = "task_name"
+pattern = "activities"

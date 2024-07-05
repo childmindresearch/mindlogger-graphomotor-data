@@ -4,13 +4,27 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import List, Optional, Tuple
 from zipfile import ZipFile
 
 import pandas as pd
 from bidsi import BidsBuilder, BidsModel
 
+from .report_preprocessors import (
+    CrashPreprocessor,
+    DateTimePreprocessor,
+    ReportPreprocessor,
+    StudyIdPreprocessor,
+)
+from .version_processors import DataVersionProcessor, DefaultDataProcessor
+
 LOG = logging.getLogger(__name__)
+
+ALL_REPORT_PREPROCESSORS: list[ReportPreprocessor] = [
+    StudyIdPreprocessor(),
+    DateTimePreprocessor(),
+    CrashPreprocessor(),
+]
+ALL_VERSION_PROCESSORS: list[DataVersionProcessor] = [DefaultDataProcessor()]
 
 
 class GraphomotorReport:
@@ -38,7 +52,8 @@ class GraphomotorReport:
         drawing_dir: Path,
         media_dir: Path,
         trails_dir: Path,
-        datetime_format: Optional[str] = None,
+        preprocessors: list[ReportPreprocessor] = ALL_REPORT_PREPROCESSORS,
+        version_processors: list[DataVersionProcessor] = ALL_VERSION_PROCESSORS,
     ) -> None:
         """Initialize Graphomotor report."""
         self._data_directory = data_directory
@@ -50,7 +65,9 @@ class GraphomotorReport:
         self._media = list(self._media_dir.glob("*"))
         self._trails_dir = trails_dir
         self._trails = list(self._trails_dir.glob("*"))
-        self._datetime_format = datetime_format
+        self._preprocessors = preprocessors
+        self._version_processors = version_processors
+        self._preprocessed = False
 
     def user_ids(self) -> pd.Series:
         """Return unique users in report."""
@@ -104,85 +121,62 @@ class GraphomotorReport:
             f"No responses found: {response}"
         )
 
-    def _search_media(self, search: str) -> List[Path]:
+    def _search_media(self, search: str) -> list[Path]:
         """Filter media files matching search string."""
         return [file for file in self._media_dir.iterdir() if file.match(search)]
 
-    def _search_drawings(self, search: str) -> List[Path]:
+    def _search_drawings(self, search: str) -> list[Path]:
         """Filter drawing files matching search string."""
         return [file for file in self._drawing_dir.iterdir() if file.match(search)]
 
-    def _search_trails(self, search: str) -> List[Path]:
+    def _search_trails(self, search: str) -> list[Path]:
         """Filter trail files matching search string."""
         return [file for file in self._trails_dir.iterdir() if file.match(search)]
 
-    def _parse_response(self, response: str) -> Tuple[pd.DataFrame | Path, str]:
+    def _parse_response(self, response: str) -> pd.DataFrame | Path:
         """Parse resource string to Path."""
         # If response is a value, return a DataFrame with the value
         if response.startswith("value:"):
-            return (
-                pd.DataFrame([["value"], [response.split(":")[1].strip()]]),
-                ".tsv",
-            )
+            LOG.debug(f"_parse_response: parsing value: {response}")
+            return pd.DataFrame([response.split(":")[1].strip()], columns=["value"])
         # If response is a CSV file, read so that it is converted to TSV
         elif response.endswith(".csv"):
-            return (
-                pd.read_csv(
-                    self._data_directory / self._find_response_artifact_path(response)
-                ),
-                ".tsv",
+            LOG.debug(f"_parse_response: Reading CSV: {response}")
+            return pd.read_csv(
+                self._data_directory / self._find_response_artifact_path(response)
             )
         # If response is a different filetype, return the file path
-        return (
-            self._data_directory / self._find_response_artifact_path(response),
-            response[-4:],
-        )
+        LOG.debug(f"_parse_response: Returning file path: {response}")
+        return self._data_directory / self._find_response_artifact_path(response)
 
     def bids_model(self) -> BidsModel:
         """Construct BIDS Model from current data model."""
+        if not self._preprocessed:
+            LOG.info(
+                "Running preprocessors: "
+                f"{[p.__class__.__name__ for p in self._preprocessors]}"
+            )
+            for preprocessor in self._preprocessors:
+                self._report, self._activity_user_journey = preprocessor(
+                    self._report, self._activity_user_journey
+                )
+            self._preprocessed = True
+
+        # Construct BIDS model
         builder = BidsBuilder()
         for row in self._report.itertuples(name="Row"):
-            if row.item == "study_id":
-                continue
-            (resource, suffix) = self._parse_response(row.response)
-            builder.add(
-                subject_id=row.study_id,
-                datatype="beh",
-                task_name=row.item,
-                suffix=suffix,
-                resource=resource,
-                metadata={
-                    "mindlogger_id": row.id,
-                    "activity_start_time": row.activity_start_time.strftime(
-                        self._datetime_format
+            resource = self._parse_response(row.response)
+            for processor in self._version_processors:
+                if processor.check_version(row.version):
+                    builder = processor.process_report_row(row, resource, builder)
+                    break
+        for study_id, activities in self._activity_user_journey.groupby("study_id"):
+            for processor in self._version_processors:
+                if processor.check_version(activities.version):
+                    builder = processor.process_activities(
+                        study_id, activities, builder
                     )
-                    if self._datetime_format is not None
-                    else row.activity_start_time.isoformat(),
-                    "activity_end_time": row.activity_end_time.strftime(
-                        self._datetime_format
-                    )
-                    if self._datetime_format is not None
-                    else row.activity_start_time.isoformat(),
-                    "activity_scheduled_time": row.activity_scheduled_time,
-                    "flag": row.flag,
-                    "secret_user_id": row.secret_user_id,
-                    "user_id": row.userId,
-                    "activity_id": row.activity_id,
-                    "activity_name": row.activity_name,
-                    "activity_flow_id": row.activity_flow_id,
-                    "activity_flow_name": row.activity_flow_name,
-                    "item_id": row.item_id,
-                    "item": row.item,
-                    "response": row.response,
-                    "prompt": row.prompt,
-                    "options": row.options,
-                    "version": row.version,
-                    "rawScore": row.rawScore,
-                    "reviewing_id": row.reviewing_id,
-                    "event_id": row.event_id,
-                    "timezone_offset": row.timezone_offset,
-                },
-            )
+                    break
         return builder.build()
 
     @classmethod
@@ -195,27 +189,13 @@ class GraphomotorReport:
         if not activity_path.is_file():
             raise FileNotFoundError(f"File {activity_path} does not exist.")
         activity_user_journey = pd.read_csv(activity_path)
-        activity_user_journey.fillna("", inplace=True)
+        # activity_user_journey.fillna("", inplace=True)
 
         report_path = data_directory / cls._REPORT_FILENAME
         if not report_path.is_file():
             raise FileNotFoundError(f"File {report_path} does not exist.")
         report = pd.read_csv(report_path)
-        report.fillna("", inplace=True)
-
-        # Construct column for study_id
-        report["study_id"] = report["response"].where(report["item"] == "study_id")
-        # Set study_id for cursive_q to the row above, backfill other values
-        report["study_id"] = (
-            report["study_id"].fillna(report["study_id"].shift(1)).bfill()
-        )
-        # Convert timestamps to datetime
-        report["activity_end_time"] = pd.to_datetime(
-            report["activity_end_time"], unit="ms", utc=True
-        ).dt.tz_convert("America/New_York")
-        report["activity_start_time"] = pd.to_datetime(
-            report["activity_start_time"], unit="ms", utc=True
-        ).dt.tz_convert("America/New_York")
+        # report.fillna("", inplace=True)
 
         try:
             drawing_responses_path = next(
