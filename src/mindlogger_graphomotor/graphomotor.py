@@ -69,22 +69,6 @@ class GraphomotorReport:
         self._version_processors = version_processors
         self._preprocessed = False
 
-    def user_ids(self) -> pd.Series:
-        """Return unique users in report."""
-        return self._report["userId"].unique()
-
-    def activity_ids(self) -> pd.Series:
-        """Return unique activities in report."""
-        return self._report["activity_id"].unique()
-
-    def activity_flow_ids(self) -> pd.Series:
-        """Return unique activity flows in report."""
-        return self._report["activity_flow_id"].unique()
-
-    def item_ids(self) -> pd.Series:
-        """Return unique items in report."""
-        return self._report["item_id"].unique()
-
     def _find_response_artifact_path(self, response: str) -> Path:
         """Find Path to response artifact."""
         media_responses = self._search_media(response)
