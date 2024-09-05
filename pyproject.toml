@@ -1,31 +1,45 @@
-[tool.poetry]
+[project]
 name = "mindlogger-graphomotor"
 version = "0.1.0"
 description = "Mindlogger export parsing and conversion in Python"
-authors = ["Gabriel Schubiner <gabriel.schubiner@childmind.org>"]
-license = ""
 readme = "README.md"
-packages = [{include = "mindlogger_graphomotor", from = "src"}]
+license = {text = "GPLv3"}
+requires-python = ">=3.10"
+authors = [
+  {name = "Gabriel Schubiner", email = "gabriel.schubiner@childmind.org"}
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12"
+]
+dependencies = [
+  "pandas>=2.2.2",
+  "packaging>=24.1",
+  "bidsi"
+]
 
-[tool.poetry.scripts]
-graphomotor2bids = "mindlogger_graphomotor.__main__:cli"
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry.dependencies]
-python = "~3.12"
-pandas = "^2.2.2"
+[tool.uv]
+dev-dependencies = [
+  "pytest>=8.3.2,<9",
+  "mypy>=1.11.1",
+  "pre-commit>=3.8.0",
+  "pytest-cov>=5.0.0",
+  "ruff>=0.5.5",
+  "pdoc>=14.6.0"
+]
+
+[tool.uv.sources]
 bidsi = {git = "https://github.com/childmindresearch/bidsi.git"}
-packaging = "^24.1"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.2.1"
-mypy = "^1.9.0"
-pre-commit = "^3.7.0"
-pytest-cov = "^5.0.0"
-ruff = "^0.4.5"
-ipykernel = "^6.29.4"
-
-[tool.poetry.group.docs.dependencies]
-pdoc = "^14.5.0"
 
 [tool.pytest.ini_options]
 pythonpath = [
@@ -88,7 +102,3 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
-
-[build-system]
-requires = ["poetry-core>=1.2.0"]
-build-backend = "poetry.core.masonry.api"
