@@ -15,9 +15,6 @@ jobs:
       uses: astral-sh/setup-uv@v2
       with:
         version: latest
-    - name: Install dependencies
-      run: |
-        uv install
     - name: Run tests
       id: run-tests
       run: >
@@ -42,9 +39,6 @@ jobs:
       uses: astral-sh/setup-uv@v2
       with:
         version: latest
-    - name: Install dependencies
-      run: |
-        uv install
     - name: Ruff format
       run: uv run ruff format --check
     - name: Ruff check
@@ -58,9 +52,5 @@ jobs:
       uses: astral-sh/setup-uv@v2
       with:
         version: latest
-    - name: Install dependencies
-      run: |
-        uv install
     - run: |
-        uv install
         uv run mypy .
