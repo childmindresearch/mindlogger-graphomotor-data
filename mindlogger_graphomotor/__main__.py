@@ -1,4 +1,4 @@
-"""Main command-line interface for the Oak MindLogger package."""
+"""Main command-line interface for the Graphomotor MindLogger package."""
 
 import argparse
 import logging
@@ -27,10 +27,10 @@ def main(
 
 
 def cli() -> None:
-    """Command-line interface for Oak MindLogger package."""
+    """Command-line interface for Graphomotor MindLogger package."""
     parser = argparse.ArgumentParser(
-        prog="Oak BIDS",
-        description="Converts Oak export data from MindLogger to BIDS format.",
+        prog="Graphomotor BIDS",
+        description="Converts Graphomotor export data from MindLogger to BIDS format.",
     )
     parser.add_argument(
         "--export",
